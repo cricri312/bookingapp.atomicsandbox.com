@@ -51,3 +51,9 @@ Hasło do wszystkich kont: `password`
 ```bash
 php artisan test
 ```
+
+## Co można by dodać
+
+- Powiadomienia e-mail przy kluczowych zmianach statusu rezerwacji (np. potwierdzenie, anulowanie)
+- Wizualizacja sali z wyborem miejsc
+- Możliwość rezerwacji części sali dla kilku grup jednocześnie, jeśli sala ma wystarczającą pojemność
