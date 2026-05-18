@@ -27,6 +27,12 @@ class DatabaseSeeder extends Seeder
             'email' => 'test2@bookingapp.com',
         ]);
 
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@bookingapp.com',
+            'is_admin' => true,
+        ]);
+
         $this->call(RoomSeeder::class);
     }
 }

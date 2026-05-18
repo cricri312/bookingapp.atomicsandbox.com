@@ -80,7 +80,7 @@ async function submit() {
       return;
     }
 
-    emit('logged-in', data.token);
+    emit('logged-in', { token: data.token, user: data.user });
   } finally {
     loading.value = false;
   }

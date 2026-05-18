@@ -13,6 +13,7 @@ class Booking extends Model
         'ends_at',
         'participants_count',
         'status',
+        'admin_note',
     ];
 
     protected $casts = [

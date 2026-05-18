@@ -73,6 +73,25 @@ class BookingController extends Controller
         return response()->json($booking->load('room'), 201);
     }
 
+    public function adminIndex()
+    {
+        return response()->json(
+            Booking::with(['room', 'user'])->latest()->get()
+        );
+    }
+
+    public function updateStatus(Request $request, Booking $booking)
+    {
+        $data = $request->validate([
+            'status'     => 'required|in:pending,confirmed,cancelled',
+            'admin_note' => 'nullable|string|max:1000',
+        ]);
+
+        $booking->update($data);
+
+        return response()->json($booking->load(['room', 'user']));
+    }
+
     public function cancel(Request $request, Booking $booking)
     {
         if ($booking->user_id !== $request->user()->id) {

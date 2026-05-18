@@ -14,4 +14,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings', [BookingController::class, 'index']);
     Route::patch('/bookings/{booking}/cancel', [BookingController::class, 'cancel']);
+
+    Route::middleware('is_admin')->group(function () {
+        Route::get('/admin/bookings', [BookingController::class, 'adminIndex']);
+        Route::patch('/admin/bookings/{booking}/status', [BookingController::class, 'updateStatus']);
+    });
 });

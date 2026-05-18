@@ -1,12 +1,13 @@
 <template>
   <div>
-    <h2 class="mb-4">Moje rezerwacje</h2>
+    <h2 class="mb-4">Panel admina — wszystkie rezerwacje</h2>
     <div v-if="loading" class="text-center">Ładowanie...</div>
     <div v-else-if="bookings.length === 0" class="alert alert-info">Brak rezerwacji.</div>
     <div v-else class="table-responsive">
       <table class="table table-striped align-middle">
         <thead>
           <tr>
+            <th>Użytkownik</th>
             <th>Pokój</th>
             <th>Od</th>
             <th>Do</th>
@@ -18,25 +19,28 @@
         </thead>
         <tbody>
           <tr v-for="booking in bookings" :key="booking.id">
+            <td>{{ booking.user?.name ?? '—' }}</td>
             <td>{{ booking.room?.name ?? '—' }}</td>
             <td>{{ formatDate(booking.starts_at) }}</td>
             <td>{{ formatDate(booking.ends_at) }}</td>
             <td>{{ booking.participants_count }}</td>
             <td>
-              <span class="badge" :class="statusClass(booking.status)">{{ booking.status }}</span>
+              <select class="form-select form-select-sm" v-model="booking.status" style="width: auto">
+                <option value="pending">pending</option>
+                <option value="confirmed">confirmed</option>
+                <option value="cancelled">cancelled</option>
+              </select>
             </td>
             <td>
-              <span v-if="booking.admin_note" class="text-muted fst-italic">{{ booking.admin_note }}</span>
-              <span v-else class="text-muted">—</span>
+              <input class="form-control form-control-sm" v-model="booking.admin_note" placeholder="Notatka..." />
             </td>
             <td>
               <button
-                v-if="booking.status !== 'cancelled'"
-                class="btn btn-sm btn-danger"
-                :disabled="cancelling === booking.id"
-                @click="cancel(booking)"
+                class="btn btn-sm btn-primary"
+                :disabled="saving === booking.id"
+                @click="save(booking)"
               >
-                Anuluj
+                {{ saving === booking.id ? '...' : 'Zapisz' }}
               </button>
             </td>
           </tr>
@@ -53,16 +57,12 @@ import { apiFetch } from '../api.js';
 
 const bookings = ref([]);
 const loading = ref(true);
-const cancelling = ref(null);
+const saving = ref(null);
 const error = ref(null);
 
 onMounted(async () => {
-  await fetchBookings();
-});
-
-async function fetchBookings() {
   try {
-    const { res, data } = await apiFetch('/bookings');
+    const { res, data } = await apiFetch('/admin/bookings');
     if (res.ok) bookings.value = data;
     else error.value = 'Nie udało się załadować rezerwacji.';
   } catch {
@@ -70,24 +70,23 @@ async function fetchBookings() {
   } finally {
     loading.value = false;
   }
-}
+});
 
-async function cancel(booking) {
-  cancelling.value = booking.id;
+async function save(booking) {
+  saving.value = booking.id;
+  error.value = null;
   try {
-    const { res } = await apiFetch(`/bookings/${booking.id}/cancel`, { method: 'PATCH' });
-    if (res.ok) booking.status = 'cancelled';
-    else error.value = 'Nie udało się anulować rezerwacji.';
+    const { res, data } = await apiFetch(`/admin/bookings/${booking.id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status: booking.status, admin_note: booking.admin_note }),
+    });
+    if (!res.ok) error.value = data.message ?? 'Błąd zapisu.';
   } finally {
-    cancelling.value = null;
+    saving.value = null;
   }
 }
 
-function formatDate(datatime) {
-  return new Date(datatime).toLocaleString('pl-PL');
-}
-
-function statusClass(status) {
-  return { pending: 'bg-warning text-dark', confirmed: 'bg-success', cancelled: 'bg-secondary' }[status] ?? 'bg-secondary';
+function formatDate(dt) {
+  return new Date(dt).toLocaleString('pl-PL');
 }
 </script>

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->timestamp('ends_at')->nullable();
             $table->unsignedInteger('participants_count');
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
+            $table->text('admin_note')->nullable();
             $table->timestamps();
         });
     }
