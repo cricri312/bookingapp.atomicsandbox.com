@@ -17,6 +17,15 @@ class AuthController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'name.required'      => 'Imię jest wymagane.',
+            'name.max'           => 'Imię może mieć maksymalnie 255 znaków.',
+            'email.required'     => 'Adres e-mail jest wymagany.',
+            'email.email'        => 'Podaj prawidłowy adres e-mail.',
+            'email.unique'       => 'Ten adres e-mail jest już zajęty.',
+            'password.required'  => 'Hasło jest wymagane.',
+            'password.min'       => 'Hasło musi mieć co najmniej 8 znaków.',
+            'password.confirmed' => 'Hasła nie są identyczne.',
         ]);
 
         $user = User::create([
@@ -35,6 +44,10 @@ class AuthController extends Controller
         $data = $request->validate([
             'email'    => 'required|email',
             'password' => 'required|string',
+        ], [
+            'email.required'    => 'Adres e-mail jest wymagany.',
+            'email.email'       => 'Podaj prawidłowy adres e-mail.',
+            'password.required' => 'Hasło jest wymagane.',
         ]);
 
         if (!Auth::attempt($data)) {
