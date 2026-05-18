@@ -39,10 +39,11 @@ php artisan serve
 
 ## Dane testowe
 
-Hasło do obu kont: `password`
+Hasło do wszystkich kont: `password`
 
 - test@bookingapp.com
 - test2@bookingapp.com
+- admin@bookingapp.com (konto admina)
 
 
 ## Testy
